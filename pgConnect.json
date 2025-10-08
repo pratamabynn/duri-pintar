@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "CONNECTION_NAME",
+            "Group": "GROUP_TEST",
+            "Host": "pg-15053d3a-duri-pintar.j.aivencloud.com",
+            "Port": 20326,
+            "MaintenanceDB": "defaultdb",
+            "Username": "avnadmin",
+            "SSLMode": "require"
+        }
+    }
+}
