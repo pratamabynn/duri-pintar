@@ -5,7 +5,7 @@ import numpy as np
 from io import BytesIO
 from db import insert_history
 
-penyakit_bp = Blueprint('penyakit', __name__, url_prefix="/duri-pintar/penyakit")
+penyakit_bp = Blueprint('penyakit', __name__, url_prefix="/penyakit")
 
 print("🔄 Loading model penyakit...")
 model = load_model("penyakit-durian.h5")

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-logout_bp = Blueprint("logout", __name__, url_prefix="/duri-pintar/logout")
+logout_bp = Blueprint("logout", __name__, url_prefix="/logout")
 
 @logout_bp.route("", methods=["POST"])
 def logout():

@@ -9,7 +9,7 @@ from logout_routes import logout_bp
 
 app = Flask(__name__)
 
-@app.route('/duri-pintar/')
+@app.route('/')
 def home():
     return "Server Flask Aktif"
 

@@ -5,7 +5,7 @@ from db import get_connection
 
 register_bp = Blueprint("register", __name__) 
 
-@register_bp.route("/duri-pintar/register", methods=["POST"])
+@register_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
     nama = data.get("nama")

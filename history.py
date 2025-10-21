@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from db import get_history
 
-history_bp = Blueprint("history", __name__, url_prefix="/duri-pintar/history")
+history_bp = Blueprint("history", __name__, url_prefix="/history")
 
 @history_bp.route("/", methods=["GET"])
 def history():

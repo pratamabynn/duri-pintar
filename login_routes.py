@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from db import get_connection
 from werkzeug.security import check_password_hash
 
-login_bp = Blueprint('login', __name__, url_prefix="/duri-pintar/login")
+login_bp = Blueprint('login', __name__, url_prefix="/login")
 
 @login_bp.route('', methods=['POST'])
 def login():

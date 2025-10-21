@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import requests
 
-weather_bp = Blueprint("weather", __name__, url_prefix="/duri-pintar/weather")
+weather_bp = Blueprint("weather", __name__, url_prefix="/weather")
 
 OPENWEATHER_API_KEY = "de357b9909f8fd8ae8515a879d689a38"
 OPENWEATHER_URL = "https://api.openweathermap.org/data/2.5/weather"
