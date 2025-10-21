@@ -1,3 +1,6 @@
+import gevent.monkey
+gevent.monkey.patch_all()  # <--- INI PENTING!
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
