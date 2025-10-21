@@ -8,9 +8,10 @@ from db import insert_history
 
 jenis_bp = Blueprint('jenis', __name__, url_prefix="/jenis")
 
-print("🔄 Loading model jenis durian...")
-model_jenis = load_model("jenis-durian.h5")
-print("✅ Model jenis durian berhasil dimuat.")
+# HILANGKAN baris load_model di sini!
+# print("🔄 Loading model jenis durian...")
+model_jenis = None # Deklarasikan sebagai None
+# print("✅ Model jenis durian berhasil dimuat.")
 
 labels_jenis = [
     "BENGKULU DURIAN",
@@ -22,6 +23,15 @@ labels_jenis = [
     "SUMATRA SUPER DURIAN"
 ]
 
+def get_jenis_model():
+    """Fungsi untuk memuat model jenis HANYA SEKALI per worker."""
+    global model_jenis
+    if model_jenis is None:
+        print("🔄 Loading model jenis durian (LAZY)...")
+        model_jenis = load_model("jenis-durian.h5")
+        print("✅ Model jenis durian berhasil dimuat (LAZY).")
+    return model_jenis
+
 # Fungsi preprocess sesuai Xception
 def preprocess_image(img_bytes):
     img = image.load_img(BytesIO(img_bytes), target_size=(224, 224))
@@ -32,6 +42,8 @@ def preprocess_image(img_bytes):
 
 @jenis_bp.route('/predict-jenis', methods=['POST'])
 def predict_jenis():
+    model_instance = get_jenis_model()
+    
     try:
         if 'file' not in request.files:
             return jsonify({
@@ -44,7 +56,7 @@ def predict_jenis():
 
         img_array = preprocess_image(file.read())
 
-        predictions = model_jenis.predict(img_array)
+        predictions = model_instance.predict(img_array)
         predicted_class = labels_jenis[np.argmax(predictions)]
         confidence = float(np.max(predictions))
 

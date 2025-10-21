@@ -7,14 +7,29 @@ from db import insert_history
 
 penyakit_bp = Blueprint('penyakit', __name__, url_prefix="/penyakit")
 
-print("🔄 Loading model penyakit...")
-model = load_model("penyakit-durian.h5")
-print("✅ Model penyakit berhasil dimuat.")
+# HILANGKAN baris load_model di sini!
+# print("🔄 Loading model penyakit...")
+model = None # Deklarasikan sebagai None di level global
+# print("✅ Model penyakit berhasil dimuat.")
 
 class_labels = ["ALGAL LEAF SPOT", "ALLOCARIDARA ATTACK", "HEALTHY LEAF", "LEAF BLIGHT", "PHOMOPSIS LEAF SPOT"]
 
+def get_penyakit_model():
+    """Fungsi untuk memuat model HANYA SEKALI per worker."""
+    global model
+    if model is None:
+        print("🔄 Loading model penyakit (LAZY)...")
+        # PENTING: Gunakan 'free=True' jika Anda memiliki masalah alokasi memori, 
+        # namun defaultnya TensorFlow 2.x sudah menangani ini.
+        model = load_model("penyakit-durian.h5")
+        print("✅ Model penyakit berhasil dimuat (LAZY).")
+    return model
+
 @penyakit_bp.route('/predict', methods=['POST'])
 def predict():
+    # Panggil model di sini
+    model_instance = get_penyakit_model()
+    
     try:
         if "file" not in request.files:
             return jsonify({"status": "error", "message": "File tidak ditemukan"}), 400
@@ -26,7 +41,7 @@ def predict():
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 
-        predictions = model.predict(img_array)
+        predictions = model_instance.predict(img_array)
         predicted_index = np.argmax(predictions)
         predicted_class = class_labels[predicted_index]
         confidence = float(np.max(predictions))
