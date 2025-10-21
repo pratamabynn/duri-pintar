@@ -9,7 +9,7 @@ from db import insert_history
 jenis_bp = Blueprint('jenis', __name__, url_prefix="/duri-pintar/jenis")
 
 print("🔄 Loading model jenis durian...")
-model_jenis = load_model("Jenis durian fine tuning 2.h5")
+model_jenis = load_model("jenis-durian.h5")
 print("✅ Model jenis durian berhasil dimuat.")
 
 labels_jenis = [
@@ -70,3 +70,4 @@ def predict_jenis():
             "status": "error",
             "message": f"Terjadi kesalahan: {str(e)}"
         }), 500
+
