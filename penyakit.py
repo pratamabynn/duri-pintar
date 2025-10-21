@@ -8,7 +8,7 @@ from db import insert_history
 penyakit_bp = Blueprint('penyakit', __name__, url_prefix="/duri-pintar/penyakit")
 
 print("🔄 Loading model penyakit...")
-model = load_model("Durian fine tuning 2.h5")
+model = load_model("penyakit-durian.h5")
 print("✅ Model penyakit berhasil dimuat.")
 
 class_labels = ["ALGAL LEAF SPOT", "ALLOCARIDARA ATTACK", "HEALTHY LEAF", "LEAF BLIGHT", "PHOMOPSIS LEAF SPOT"]
@@ -53,3 +53,4 @@ def predict():
             "status": "error",
             "message": f"Terjadi kesalahan: {str(e)}"
         }), 500
+
