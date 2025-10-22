@@ -7,29 +7,28 @@ from db import insert_history
 
 penyakit_bp = Blueprint('penyakit', __name__, url_prefix="/penyakit")
 
-# HILANGKAN baris load_model di sini!
-# print("🔄 Loading model penyakit...")
-model = None # Deklarasikan sebagai None di level global
-# print("✅ Model penyakit berhasil dimuat.")
+print("🔄 Loading model penyakit...")
+model = load_model("Durian fine tuning 2.h5")
+print("✅ Model penyakit berhasil dimuat.")
 
-class_labels = ["ALGAL LEAF SPOT", "ALLOCARIDARA ATTACK", "HEALTHY LEAF", "LEAF BLIGHT", "PHOMOPSIS LEAF SPOT"]
+class_labels = [
+    "ALGAL LEAF SPOT",
+    "ALLOCARIDARA ATTACK",
+    "HEALTHY LEAF",
+    "LEAF BLIGHT",
+    "PHOMOPSIS LEAF SPOT"
+]
 
-def get_penyakit_model():
-    """Fungsi untuk memuat model HANYA SEKALI per worker."""
-    global model
-    if model is None:
-        print("🔄 Loading model penyakit (LAZY)...")
-        # PENTING: Gunakan 'free=True' jika Anda memiliki masalah alokasi memori, 
-        # namun defaultnya TensorFlow 2.x sudah menangani ini.
-        model = load_model("penyakit-durian.h5")
-        print("✅ Model penyakit berhasil dimuat (LAZY).")
-    return model
+penyakit_descriptions = {
+    "ALGAL LEAF SPOT": "Penyakit yang disebabkan oleh alga hijau parasit (Cephaleuros virescens). Gejalanya berupa bercak hijau keabu-abuan di permukaan daun yang bisa berkembang menjadi coklat kemerahan.",
+    "ALLOCARIDARA ATTACK": "Serangan serangga *Allocaridara malayensis* yang biasanya menyebabkan bercak kuning atau lubang kecil pada daun akibat aktivitas mengisap cairan daun.",
+    "HEALTHY LEAF": "Daun dalam kondisi sehat tanpa tanda-tanda penyakit atau serangan hama. Warna daun hijau merata dan permukaan bersih.",
+    "LEAF BLIGHT": "Penyakit hawar daun yang disebabkan oleh jamur. Menyebabkan tepi daun mengering, bercak coklat kehitaman, dan akhirnya daun gugur.",
+    "PHOMOPSIS LEAF SPOT": "Infeksi jamur *Phomopsis sp.* yang menimbulkan bercak kecil berwarna coklat dengan tepi kekuningan. Penyakit ini dapat menyebabkan daun mengering dan rontok prematur."
+}
 
 @penyakit_bp.route('/predict', methods=['POST'])
 def predict():
-    # Panggil model di sini
-    model_instance = get_penyakit_model()
-    
     try:
         if "file" not in request.files:
             return jsonify({"status": "error", "message": "File tidak ditemukan"}), 400
@@ -41,7 +40,7 @@ def predict():
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 
-        predictions = model_instance.predict(img_array)
+        predictions = model.predict(img_array)
         predicted_index = np.argmax(predictions)
         predicted_class = class_labels[predicted_index]
         confidence = float(np.max(predictions))
@@ -52,14 +51,17 @@ def predict():
             return jsonify({
                 "status": "success",
                 "prediction": "Bukan daun durian",
-                "confidence": confidence
+                "confidence": confidence,
+                "description": "Gambar yang dikirim kemungkinan bukan daun durian atau kualitas gambar kurang jelas untuk dikenali."
             }), 200
         else:
+            description = penyakit_descriptions.get(predicted_class, "Deskripsi tidak tersedia.")
             insert_history("penyakit", predicted_class, confidence, file.filename)
             return jsonify({
                 "status": "success",
                 "prediction": predicted_class,
-                "confidence": confidence
+                "confidence": confidence,
+                "description": description
             }), 200
 
     except Exception as e:
@@ -68,4 +70,3 @@ def predict():
             "status": "error",
             "message": f"Terjadi kesalahan: {str(e)}"
         }), 500
-
